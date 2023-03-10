@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: "AWS CloudFormation template to create S3 bucket for static website"
+
+Resources:
+  WebSiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "frontend-resources-s3-to-do-list"
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  ApiS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: "resources-todoapi"
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+  WebSiteBucketOutput:
+    Description: "Name of the frontend s3 bucket"
+    Value: !Ref WebSiteBucket
+  ApiS3BucketOutput:
+    Description: "Name of the API s3 bucket"
+    Value: !Ref ApiS3Bucket
+  APiS3BucketArn:
+    Description: "Arn of the API s3 bucket"
+    Value: !GetAtt  ApiS3Bucket.Arn

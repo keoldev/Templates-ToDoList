@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: "AWS CloudFormation template to create lambda resource"
+
+Parameters:
+  DynamoTableArn:
+    Type: String
+    Description: "ARN of the DynamoDB table"
+  ApiS3Bucket:
+    Type: String
+    Description: "Name of the API S3 bucket"
+  ApiS3BucketArn:
+    Type: String
+    Description: "Arn of the API S3 Bucket"
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: lambda-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                  - dynamodb:GetItem
+                  - dynamodb:Scan
+                Resource: !Ref DynamoTableArn
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Ref ApiS3BucketArn
+              - Effect : Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+  TodoLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref ApiS3Bucket
+        S3Key: lambda.zip
+      Handler: main.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.9
+      FunctionName: to-do-list-lambda
+
+Outputs:
+  TodoLambdaArn:
+    Description: "Lambda Function Arn"
+    Value: !GetAtt TodoLambda.Arn

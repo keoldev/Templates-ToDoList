@@ -1,0 +1,168 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: "AWS CloudFormation template to create API Gateway resource"
+
+Parameters:
+  CognitoUserPoolArn:
+    Type: String
+    Description: "ARN of the Cognito User pool."
+  TodoLambdaArn:
+    Type: String
+    Description: "ARN of the Lambda function."
+
+Resources:
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: "todo-API"
+      Description: "API for the todolist application."
+      EndpointConfiguration:
+        Types:
+          - EDGE
+
+  CognitoAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      Name: "CognitoAuthorizer"
+      Type: "COGNITO_USER_POOLS"
+      IdentitySource: "method.request.header.Authorization"
+      ProviderARNs:
+        - !Ref CognitoUserPoolArn
+  
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "api-gateway-role"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: "api-gateway-policy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !Ref TodoLambdaArn
+
+  ApiGatewayGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: "COGNITO_USER_POOLS"
+      AuthorizerId: !Ref CognitoAuthorizer
+      RestApiId: !Ref ApiGatewayRestApi
+      HttpMethod: "GET"
+      ResourceId: !GetAtt ApiGatewayRestApi.RootResourceId
+      Integration:
+        ConnectionType: "INTERNET"
+        Credentials: !GetAtt ApiGatewayRole.Arn
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TodoLambdaArn}/invocations"
+
+  ApiGatewayPostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: "COGNITO_USER_POOLS"
+      AuthorizerId: !Ref CognitoAuthorizer
+      RestApiId: !Ref ApiGatewayRestApi
+      HttpMethod: "POST"
+      ResourceId: !GetAtt ApiGatewayRestApi.RootResourceId
+      Integration:
+        ConnectionType: "INTERNET"
+        Credentials: !GetAtt ApiGatewayRole.Arn
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TodoLambdaArn}/invocations"
+
+  ApiGatewayPutMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: "COGNITO_USER_POOLS"
+      AuthorizerId: !Ref CognitoAuthorizer
+      RestApiId: !Ref ApiGatewayRestApi
+      HttpMethod: "PUT"
+      ResourceId: !GetAtt ApiGatewayRestApi.RootResourceId
+      Integration:
+        ConnectionType: "INTERNET"
+        Credentials: !GetAtt ApiGatewayRole.Arn
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TodoLambdaArn}/invocations"
+
+  ApiGatewayDeleteMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: "COGNITO_USER_POOLS"
+      AuthorizerId: !Ref CognitoAuthorizer
+      RestApiId: !Ref ApiGatewayRestApi
+      HttpMethod: "DELETE"
+      ResourceId: !GetAtt ApiGatewayRestApi.RootResourceId
+      Integration:
+        ConnectionType: "INTERNET"
+        Credentials: !GetAtt ApiGatewayRole.Arn
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TodoLambdaArn}/invocations" 
+
+  ApiGatewatOptionsMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      ResourceId: !GetAtt ApiGatewayRestApi.RootResourceId
+      RestApiId: !Ref ApiGatewayRestApi
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS,GET,PUT,DELETE'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+            StatusCode: '200'
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+          StatusCode: '200'
+  
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ApiGatewayGetMethod
+      - ApiGatewayPostMethod
+      - ApiGatewayPutMethod
+      - ApiGatewayDeleteMethod
+      - ApiGatewatOptionsMethod
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      Description: "API Gateway deployment for the todolist application."
+
+  ApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      DeploymentId: !Ref ApiGatewayDeployment
+      StageName: "test"
+      Description: "API Gateway stage for the todolist application."
+
+Outputs:
+  ApiGatewayStageArn:
+    Description: "ARN of the API Gateway stage."
+    Value: !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGatewayRestApi}/stages/${ApiGatewayStage}"

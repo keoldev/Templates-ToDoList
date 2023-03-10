@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  WebSiteBucket:
+    Type: String
+    Description: "Name of the frontend S3 bucket"
+
+Resources:
+  WebSiteOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: "OAI for the website"
+
+  WebSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebSiteBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${WebSiteOAI}"
+            Action: "s3.GetObject"
+            Resource: !Sub "arn:aws:s3:::${WebSiteBucket}/*"
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !Sub "${WebSiteBucket}.s3.${AWS::Region}.amazonaws.com"
+            Id: s3-website-bucket
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "orgin-access-identity/cloudfront/${WebSiteOAI}"
+        Enabled: true
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: s3-website-bucket
+          ViewerProtocolPolicy: allow-all
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+        PriceClass: PriceClass_All
+
+Outputs:
+  CloudFrontDistributionURL:
+    Description: "URL of the CloudFront distribution"
+    Value: !GetAtt CloudFrontDistribution.DomainName
+  WebSiteOAI:
+    Description: "OAI for the website"
+    Value: !Ref WebSiteOAI

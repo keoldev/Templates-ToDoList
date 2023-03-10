@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      AutoVerifiedAttributes:
+        - "email"
+      MfaConfiguration: "OFF"
+      UserAttributeUpdateSettings:
+        AttributesRequireVerificationBeforeUpdate:
+          - "email"
+      EmailConfiguration:
+        EmailSendingAccount: "COGNITO_DEFAULT"
+      UsernameAttributes:
+        - "email"
+      UserPoolName: "users-todolist"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 1
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: "todo-client"
+      GenerateSecret: false
+      UserPoolId: !Ref CognitoUserPool
+      ExplicitAuthFlows:
+        - "ALLOW_ADMIN_USER_PASSWORD_AUTH"
+        - "ALLOW_USER_PASSWORD_AUTH"
+        - "ALLOW_REFRESH_TOKEN_AUTH"
+      AllowedOAuthFlows:
+        - "implicit"
+      AllowedOAuthScopes:
+        - "phone"
+        - "email"
+        - "openid"
+        - "profile"
+        - "aws.cognito.signin.user.admin"
+      SupportedIdentityProviders:
+        - "COGNITO"
+      AllowedOAuthFlowsUserPoolClient: true
+      PreventUserExistenceErrors: "ENABLED"
+      EnableTokenRevocation: true
+  CognitoDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: "todovk"
+      UserPoolId: !Ref CognitoUserPool
+
+Outputs:
+  CongnitoUserPoolArn:
+    Description: "Cognito user pool ARN"
+    Value: !GetAtt CognitoUserPool.Arn

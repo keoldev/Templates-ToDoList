@@ -5,6 +5,7 @@ Resources:
   DynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:
+      TableName: "db-todolist"
       AttributeDefinitions:
         - AttributeName: "user_id"
           AttributeType: "S"
@@ -16,7 +17,7 @@ Resources:
           KeyType: "HASH"
         - AttributeName: "task_id"
           KeyType: "RANGE"
-      TableName: "users-tasks"
+
 
 Outputs:
   DynamoTableArn:

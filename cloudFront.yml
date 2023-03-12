@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
 Parameters:
-  WebSiteBucket:
+  WebsiteBucketName:
     Type: String
     Description: "Name of the frontend S3 bucket"
 
@@ -12,10 +12,10 @@ Resources:
       CloudFrontOriginAccessIdentityConfig:
         Comment: "OAI for the website"
 
-  WebSiteBucketPolicy:
+  FrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref WebSiteBucket
+      Bucket: !Ref WebsiteBucketName
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -23,14 +23,14 @@ Resources:
             Principal:
               AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${WebSiteOAI}"
             Action: "s3.GetObject"
-            Resource: !Sub "arn:aws:s3:::${WebSiteBucket}/*"
+            Resource: !Sub "arn:aws:s3:::${WebsiteBucketName}/*"
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !Sub "${WebSiteBucket}.s3.${AWS::Region}.amazonaws.com"
+          - DomainName: !Sub "${WebsiteBucketName}.s3.${AWS::Region}.amazonaws.com"
             Id: s3-website-bucket
             S3OriginConfig:
               OriginAccessIdentity: !Sub "orgin-access-identity/cloudfront/${WebSiteOAI}"

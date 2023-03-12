@@ -3,33 +3,13 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "AWS CloudFormation template to create resources stacks"
 
 Parameters:
-  TemplatesS3Bucket:
+  TemplatesBucketName:
     Type: String
-    Description: "Name of the S3 Bucket where the resources templates are stored"
-    Default: cfn-templates-todolistapp
+    Description: 'Name of the S3 bucket where the templates resources are stored'
+    Default: cfn-templates-todolist-app
 
 Resources:
-  DynamoDBStack:
+  S3Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://${TemplatesS3Bucket}.s3.amazonaws.com/dynamo-stack.yaml
-
-  LambdaStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub https://${TemplatesS3Bucket}.s3.amazonaws.com/lambda-stack.yaml
-      Parameters:
-        DynamonDBTableArn: !GetAtt DynamoDBStack.Outputs.DynamoDBTableArn
-  
-  CognitoStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub https://${TemplatesS3Bucket}.s3.amazonaws.com/cognito-stack.yaml
-  
-  ApiGatewayStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub https://${TemplatesS3Bucket}.s3.amazonaws.com/api-gateway-stack.yaml
-      Parameters:
-        LambdaFunctionArn: !GetAtt LambdaStack.Outputs.LambdaFunctionArn
-        CognitoUserPoolArn: !GetAtt CognitoStack.Outputs.CognitoUserPoolArn
+      TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/websiteS3Bucket.yaml

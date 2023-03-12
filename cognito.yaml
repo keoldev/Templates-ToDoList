@@ -18,7 +18,7 @@ Resources:
         EmailSendingAccount: "COGNITO_DEFAULT"
       UsernameAttributes:
         - "email"
-      UserPoolName: "users-todolist"
+      UserPoolName: "users-pool-todolist"
       Policies:
         PasswordPolicy:
           MinimumLength: 1

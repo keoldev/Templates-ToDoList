@@ -20,7 +20,8 @@ Resources:
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
-            Principal: '*'
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${WebSiteOAI}"
             Action: "s3.GetObject"
             Resource: !Sub "arn:aws:s3:::${WebsiteBucketName}/*"
 
@@ -50,6 +51,7 @@ Resources:
             Cookies:
               Forward: none
         PriceClass: PriceClass_All
+    DependsOn: FrontendBucketPolicy
 
 Outputs:
   CloudFrontDistributionURL:

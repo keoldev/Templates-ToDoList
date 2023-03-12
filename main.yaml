@@ -19,7 +19,7 @@ Resources:
     Properties:
       TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/cloudFront.yaml
       Parameters:
-        WebSiteBucketName: !Ref S3Stack.Outputs.S3BucketFrontendName
+        WebSiteBucketName: !GetAtt S3Stack.Outputs.S3BucketFrontendName
 
   CognitoStack:
     Type: AWS::CloudFormation::Stack

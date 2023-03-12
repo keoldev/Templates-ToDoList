@@ -21,7 +21,7 @@ Resources:
       UserPoolName: "users-pool-todolist"
       Policies:
         PasswordPolicy:
-          MinimumLength: 1
+          MinimumLength: 8
           RequireLowercase: true
           RequireNumbers: true
           RequireSymbols: true

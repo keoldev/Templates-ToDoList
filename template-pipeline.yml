@@ -23,7 +23,7 @@ steps:
       sourceFolder: './'
       globExpressions: |
         **
-        !template-pipeline.yml
+        !.yml
         !.git/**
       createBucket: true
       

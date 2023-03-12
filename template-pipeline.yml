@@ -35,3 +35,4 @@ steps:
       templateSource: 's3'
       s3BucketName: '$(BUCKET_NAME)'
       s3ObjectKey: 'main.yml'
+      capabilityAutoExpand: true

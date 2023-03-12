@@ -1,5 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
+Parameters:
+  CloudFrontURL:
+    Type: String
+    Description: 'CloudFront URL Domain Name'
+
 Resources:
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
@@ -45,6 +50,8 @@ Resources:
         - "openid"
         - "profile"
         - "aws.cognito.signin.user.admin"
+      CallbackURLs:
+        - !Ref CloudFrontURL
       SupportedIdentityProviders:
         - "COGNITO"
       AllowedOAuthFlowsUserPoolClient: true

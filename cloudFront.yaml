@@ -20,8 +20,7 @@ Resources:
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${WebSiteOAI}"
+            Principal: '*'
             Action: "s3.GetObject"
             Resource: !Sub "arn:aws:s3:::${WebsiteBucketName}/*"
 

@@ -23,7 +23,7 @@ steps:
       sourceFolder: './'
       globExpressions: |
         **
-        !.yml
+        !*.yml
         !.git/**
       createBucket: true
       

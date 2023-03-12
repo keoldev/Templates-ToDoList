@@ -26,6 +26,7 @@ Resources:
           RequireNumbers: true
           RequireSymbols: true
           RequireUppercase: true
+  
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -49,6 +50,7 @@ Resources:
       AllowedOAuthFlowsUserPoolClient: true
       PreventUserExistenceErrors: "ENABLED"
       EnableTokenRevocation: true
+  
   CognitoDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:

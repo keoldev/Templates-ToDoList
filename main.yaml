@@ -32,4 +32,4 @@ Resources:
       TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/apigateway.yaml
       Parameters:
         CognitoUserPoolArn: !GetAtt Cognito.Outputs.CongnitoUserPoolArn
-        TodoLambdaArn: LambdaDynamoDB.Outputs.TodoLambdaArn
+        TodoLambdaArn: !GetAtt LambdaDynamoDB.Outputs.TodoLambdaArn

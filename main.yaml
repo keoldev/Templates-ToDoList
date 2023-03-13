@@ -13,3 +13,10 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/S3-CloudFront.yaml
+  
+  Cognito:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/cognito.yaml
+      Parameters:
+        CloudFrontURL: !GetAtt S3CloudFront.Outputs.CloudFrontDistributionURL

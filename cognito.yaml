@@ -51,7 +51,7 @@ Resources:
         - "profile"
         - "aws.cognito.signin.user.admin"
       CallbackURLs:
-        - !Ref CloudFrontURL
+        - !Sub https://${CloudFrontURL}
       SupportedIdentityProviders:
         - "COGNITO"
       AllowedOAuthFlowsUserPoolClient: true

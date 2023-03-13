@@ -48,7 +48,7 @@ Resources:
           - DomainName: !GetAtt S3BucketFrontEnd.DomainName
             Id: s3-bucket-frontend
             S3OriginConfig:
-              OriginAccessIdentity: !Sub "orgin-access-identity/cloudfront/${BucketOAI}"
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${BucketOAI}"
         Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:

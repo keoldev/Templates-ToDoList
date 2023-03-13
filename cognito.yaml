@@ -52,6 +52,8 @@ Resources:
         - "aws.cognito.signin.user.admin"
       CallbackURLs:
         - !Sub https://${CloudFrontURL}
+      LogoutURLs:
+        - !Sub https://${CognitoDomain}.auth.us-east-1.amazoncognito.com/login
       SupportedIdentityProviders:
         - "COGNITO"
       AllowedOAuthFlowsUserPoolClient: true

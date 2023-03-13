@@ -25,7 +25,7 @@ Resources:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
-        Comment: "OAI config for my website"
+        Comment: "My OAI config for my todolist website"
 
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -46,13 +46,13 @@ Resources:
       DistributionConfig:
         Origins:
           - DomainName: !Sub "${S3BucketFrontEnd}.s3.${AWS::Region}.amazonaws.com"
-            Id: s3-website-bucket
+            Id: s3-bucket-frontend
             S3OriginConfig:
               OriginAccessIdentity: !Sub "orgin-access-identity/cloudfront/${BucketOAI}"
         Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
-          TargetOriginId: s3-website-bucket
+          TargetOriginId: s3-bucket-frontend
           ViewerProtocolPolicy: allow-all
           AllowedMethods:
             - GET

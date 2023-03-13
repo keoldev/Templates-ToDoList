@@ -161,8 +161,3 @@ Resources:
       DeploymentId: !Ref ApiGatewayDeployment
       StageName: "test"
       Description: "API Gateway stage for the todolist application."
-
-Outputs:
-  ApiGatewayStageArn:
-    Description: "ARN of the API Gateway stage."
-    Value: !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGatewayRestApi}/stages/${ApiGatewayStage}"

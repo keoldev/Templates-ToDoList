@@ -13,13 +13,7 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
 
-  S3BucketAPI:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: 'api-resources-todolist'
-      AccessControl: Private
-      VersioningConfiguration:
-        Status: Enabled
+  
 
   BucketOAI:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity

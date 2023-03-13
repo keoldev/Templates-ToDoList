@@ -1,18 +1,32 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
 Description: "AWS CloudFormation template to create lambda resource"
-
-Parameters:
-  DynamoTableArn:
-    Type: String
-    Description: "ARN of the DynamoDB table"
-  ApiS3Bucket:
-    Type: String
-    Description: "Name of the API S3 bucket"
-  ApiS3BucketArn:
-    Type: String
-    Description: "Arn of the API S3 Bucket"
+    
 Resources:
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "db-todolist"
+      AttributeDefinitions:
+        - AttributeName: "user_id"
+          AttributeType: "S"
+        - AttributeName: "task_id"
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      KeySchema: # Required
+        - AttributeName: "user_id"
+          KeyType: "HASH"
+        - AttributeName: "task_id"
+          KeyType: "RANGE"
+
+  S3BucketAPI:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 'api-resources-todolist'
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -40,22 +54,23 @@ Resources:
                   - dynamodb:Query
                   - dynamodb:GetItem
                   - dynamodb:Scan
-                Resource: !Ref DynamoTableArn
+                Resource: !GetAtt  DynamoTable.Arn
               - Effect: Allow
                 Action:
                   - s3:GetObject
-                Resource: !Ref ApiS3BucketArn
+                Resource: !GetAtt S3BucketAPI.Arn
               - Effect : Allow
                 Action:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: '*'
+  
   TodoLambda:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: !Ref ApiS3Bucket
+        S3Bucket: !Ref S3BucketAPI
         S3Key: lambda.zip
       Handler: main.handler
       Role: !GetAtt LambdaExecutionRole.Arn

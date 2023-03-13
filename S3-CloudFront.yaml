@@ -1,21 +1,36 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
-Parameters:
-  WebsiteBucketName:
-    Type: String
-    Description: "Name of the frontend S3 bucket"
+Description: "AWS CloudFormation template to created S3 bucket and CloudFront services"
 
 Resources:
+  S3BucketFrontEnd:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 'frontend-resources-todolist'
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  S3BucketAPI:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 'api-resources-todolist'
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+
   WebSiteOAI:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
-        Comment: "OAI for the website"
+        Comment: "OAI config for my website"
 
   FrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref WebsiteBucketName
+      Bucket: !Ref S3BucketFrontEnd
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -23,14 +38,14 @@ Resources:
             Principal:
               AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${WebSiteOAI}"
             Action: "s3.GetObject"
-            Resource: !Sub "arn:aws:s3:::${WebsiteBucketName}/*"
+            Resource: !Sub "arn:aws:s3:::${S3BucketFrontEnd}/*"
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !Sub "${WebsiteBucketName}.s3.${AWS::Region}.amazonaws.com"
+          - DomainName: !Sub "${S3BucketFrontEnd}.s3.${AWS::Region}.amazonaws.com"
             Id: s3-website-bucket
             S3OriginConfig:
               OriginAccessIdentity: !Sub "orgin-access-identity/cloudfront/${WebSiteOAI}"
@@ -51,7 +66,6 @@ Resources:
             Cookies:
               Forward: none
         PriceClass: PriceClass_All
-    DependsOn: FrontendBucketPolicy
 
 Outputs:
   CloudFrontDistributionURL:

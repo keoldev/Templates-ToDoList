@@ -9,21 +9,7 @@ Parameters:
     Default: cfn-templates-todolist-app
 
 Resources:
-  S3Stack:
+  S3CloudFront:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/websiteS3Bucket.yaml
-  
-  CloudFrontStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/cloudFront.yaml
-      Parameters:
-        WebsiteBucketName: !GetAtt S3Stack.Outputs.S3BucketFrontendName
-
-  CognitoStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/cognito.yaml
-      Parameters:
-        CloudFrontURL: !GetAtt CloudFrontStack.Outputs.CloudFrontDistributionURL
+      TemplateURL: !Sub https://${TemplatesBucketName}.s3.amazonaws.com/S3-CloudFront.yaml

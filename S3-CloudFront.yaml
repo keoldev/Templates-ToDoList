@@ -7,7 +7,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: 'frontend-resources-todolist'
-      AccessControl: Private
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:

@@ -7,6 +7,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: 'frontend-resources-todolist'
+      AccessControl: Private
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -20,23 +21,23 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-  WebSiteOAI:
+  BucketOAI:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
         Comment: "OAI config for my website"
 
-  FrontendBucketPolicy:
+  BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref S3BucketFrontEnd
-      PolicyDocument:
+      PolicyDocument: 
         Version: "2012-10-17"
-        Statement:
+        Statement: 
           - Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${WebSiteOAI}"
-            Action: "s3.GetObject"
+            Principal: 
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${BucketOAI}"
+            Action: "s3:GetObject"
             Resource: !Sub "arn:aws:s3:::${S3BucketFrontEnd}/*"
 
   CloudFrontDistribution:
@@ -47,7 +48,7 @@ Resources:
           - DomainName: !Sub "${S3BucketFrontEnd}.s3.${AWS::Region}.amazonaws.com"
             Id: s3-website-bucket
             S3OriginConfig:
-              OriginAccessIdentity: !Sub "orgin-access-identity/cloudfront/${WebSiteOAI}"
+              OriginAccessIdentity: !Sub "orgin-access-identity/cloudfront/${BucketOAI}"
         Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
@@ -70,6 +71,6 @@ Outputs:
   CloudFrontDistributionURL:
     Description: "URL of the CloudFront distribution"
     Value: !GetAtt CloudFrontDistribution.DomainName
-  WebSiteOAI:
+  WebsiteOAI:
     Description: "OAI for the website"
-    Value: !Ref WebSiteOAI
+    Value: !Ref BucketOAI
